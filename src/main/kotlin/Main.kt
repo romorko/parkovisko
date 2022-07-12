@@ -3,7 +3,7 @@ import kotlin.random.Random.Default.nextInt
 
 fun generujCasyList(pocet: Int = 10): MutableList<Rozsah>
 {
-    var casyPrichodOdchod = mutableListOf<Rozsah>()
+    val casyPrichodOdchod = mutableListOf<Rozsah>()
     for (i in 0 until pocet)
     {
         var cOd = Cas(nextInt(0, 24), nextInt(0, 60))
@@ -19,24 +19,24 @@ fun generujCasyList(pocet: Int = 10): MutableList<Rozsah>
     return casyPrichodOdchod
 }
 
-fun generujCasySubor(pocet: Int, nazov: String = "vstup.txt"): Unit
+fun generujCasySubor(pocet: Int, nazov: String = "vstup.txt")
 {
     val zapis = generujCasyList(pocet).joinToString("\n")
-    File("zapis.txt").writeText(zapis)
+    File(nazov).writeText(zapis)
 }
 
 fun citajCasySubor(nazov: String = "vstup.txt"): List<Rozsah>
 {
-    var casyPrichodOdchod = mutableListOf<Rozsah>()
-    val regCasy = "([0-1]{1}[0-9]|2[0-3]):([0-5][0-9])\\s+([0-1]{1}[0-9]|2[0-3]):([0-5][0-9])\$"
+    val casyPrichodOdchod = mutableListOf<Rozsah>()
+    val regCasy = "([0-1][0-9]|2[0-3]):([0-5][0-9])\\s+([0-1][0-9]|2[0-3]):([0-5][0-9])\$"
     File(nazov).forEachLine {
         if (regCasy.toRegex().matches(it))
         {
             val vysledok = regCasy.toRegex().find(it)
-            val h1 = (vysledok!!.groups.get(1)!!.value).toInt()
-            val m1 = (vysledok!!.groups.get(2)!!.value).toInt()
-            val h2 = (vysledok!!.groups.get(3)!!.value).toInt()
-            val m2 = (vysledok!!.groups.get(4)!!.value).toInt()
+            val h1 = (vysledok!!.groups[1]!!.value).toInt()
+            val m1 = (vysledok.groups[2]!!.value).toInt()
+            val h2 = (vysledok.groups[3]!!.value).toInt()
+            val m2 = (vysledok.groups[4]!!.value).toInt()
             casyPrichodOdchod.add(Rozsah(Cas(h1, m1), Cas(h2, m2)))
         }
         else
@@ -47,7 +47,7 @@ fun citajCasySubor(nazov: String = "vstup.txt"): List<Rozsah>
     return casyPrichodOdchod
 }
 
-fun main(args: Array<String>)
+fun main()
 {
     val hodinyDna = IntArray(25) { 0 }
     for (j in 1..24)
@@ -85,5 +85,5 @@ fun main(args: Array<String>)
     {
         print(String.format("%3s", hodinyDna[i]))
     }
-    println("\nNajcastejsie je " + hodinyDna.maxOrNull() ?: 0)
+    println(("\nNajcastejsie je " + hodinyDna.maxOrNull()))
 }
