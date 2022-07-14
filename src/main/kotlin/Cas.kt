@@ -1,7 +1,7 @@
 
 class Cas(h: Int, m: Int) : Comparable<Cas>
 {
-    private var hod: Int = 0
+    var hod: Int = 0
         set(value)
         {
             //println("seter hod")
@@ -38,14 +38,26 @@ class Cas(h: Int, m: Int) : Comparable<Cas>
         this.min = m1
     }
 
+    constructor(text:String="prichodu") : this(0,0)
+    {
+        print("Zadaj cas $text:")
+        val cas= readln()
+        val regCasy = "^([0-1][0-9]|2[0-3]):([0-5][0-9])$".toRegex()
+        if (regCasy.matches(cas))
+        {
+            val vysledok = regCasy.find(cas)
+            hod = vysledok!!.groups[1]!!.value.toInt()
+            min = vysledok.groups[2]!!.value.toInt()
+        }
+        else
+        {
+            println("Nebol zadany spravny format casu!")
+        }
+    }
+
     override fun compareTo(other: Cas): Int
     {
-        return when
-        {
-            this.hod * 60 + this.min < other.hod * 60 + other.min -> -1
-            this.hod * 60 + this.min > other.hod * 60 + other.min -> 1
-            else                                                  -> 0
-        }
+        return (this.hod * 60 + this.min) compareTo (other.hod * 60 + other.min)
     }
 
     override fun toString(): String
