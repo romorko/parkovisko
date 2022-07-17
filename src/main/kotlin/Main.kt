@@ -61,7 +61,6 @@ fun vytvorZahlavie(): String
     var vratZahlavie = ""
     for (j in 1..24)
     {
-        print(String.format("%3s", j))
         vratZahlavie += String.format("%3s", j)
     }
     vratZahlavie += "\n"
@@ -73,7 +72,6 @@ fun vytvorPaticku(hodinyPocty: IntArray): String
     var vratPaticku = ""
     for (i in 1 until hodinyPocty.size)
     {
-        print(String.format("%3s", hodinyPocty[i]))
         vratPaticku += String.format("%3s", hodinyPocty[i])
     }
     return vratPaticku
@@ -82,7 +80,6 @@ fun vytvorPaticku(hodinyPocty: IntArray): String
 fun main()
 {
     val hodinyDna = IntArray(25) { 0 }
-    var vysledokDoSuboru = ""
     //val ziskaneCasy = generujCasyList(15)
     val ziskaneCasy: List<Rozsah>
     //generujCasySubor(15, "vstup.txt")
@@ -96,9 +93,10 @@ fun main()
         exitProcess(1)
     }
     //vytvori zahlavie
-    vysledokDoSuboru = vytvorZahlavie()
-    println()
+    val zahlavie = vytvorZahlavie()
     val utriedene = ziskaneCasy.sortedBy { it.zaciatok }
+    //vytvori graf
+    var graf =""
     for (rozsah in utriedene)
     {
         val zacniH = rozsah.zaciatok.dajHodinu()
@@ -109,48 +107,36 @@ fun main()
         val skonciHod = if (skonciM > 0 && skonciH < 24) skonciH + 1 else skonciH
         for (j in 1..24)
         {
-            vysledokDoSuboru += if (j in zacniHod..skonciHod)
+            graf += if (j in zacniHod..skonciHod)
             {
                 hodinyDna[j]++
-                print(String.format("%3s", "*"))
                 String.format("%3s", "*")
             }
             else
             {
-                print(String.format("%3s", "-"))
                 String.format("%3s", "-")
             }
         }
-        println(" ${rozsah.zaciatok} ${rozsah.koniec}")
-        vysledokDoSuboru += " ${rozsah.zaciatok} ${rozsah.koniec}\n"
+        graf += " ${rozsah.zaciatok} ${rozsah.koniec}\n"
     }
-    vysledokDoSuboru += vytvorPaticku(hodinyDna)
-    var max = 0
-    var maxIndex = 0
-    for ((index, hodnota) in hodinyDna.withIndex())
-    {
-        if (hodnota > max)
+    val paticka= vytvorPaticku(hodinyDna)
+    val maximum = hodinyDna.maxOf { it }
+    var statistika = "\n\nMaximum bolo $maximum v hodinach:"
+    hodinyDna.mapIndexed { index, i ->
+        if (i == maximum)
         {
-            max = hodnota
-            maxIndex = index
+            statistika += "$index "
         }
     }
-    println()
-    println("\nNajcastejsie sa vyskytuje hodina $maxIndex a to $max krat.")
-    vysledokDoSuboru += "\n\nNajcastejsie sa vyskytuje hodina $maxIndex a to $max krat."
     try
     {
-        File("vysledok.txt").writeText(vysledokDoSuboru)
+        File("vysledok.txt").writeText("$zahlavie$graf$paticka $statistika")
     }
     catch (e: FileNotFoundException)
     {
         println("Subor sa nepodarilo vytvorit!")
     }
-    val maximum = hodinyDna.maxOf { it }
-    print("Maximum bolo $maximum v hodinach: ")
-    hodinyDna.mapIndexed { index, i -> if (i == maximum) print("$index ") }
-    //println(maxima)
-    //hodinyDna.sort()
-    //hodinyDna.forEachIndexed{index,element-> println("$index,$element") }
+    println("$zahlavie$graf$paticka $statistika")
+     //hodinyDna.forEachIndexed{index,element-> println("$index,$element") }
 }
 
