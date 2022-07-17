@@ -28,7 +28,7 @@ fun generujCasySubor(pocet: Int, nazov: String = "vstup.txt")
     {
         File(nazov).writeText(zapis)
     }
-    catch (e:FileNotFoundException)
+    catch (e: FileNotFoundException)
     {
         println("Subor sa nepodarilo otvorit!")
     }
@@ -37,26 +37,47 @@ fun generujCasySubor(pocet: Int, nazov: String = "vstup.txt")
 fun citajCasySubor(nazov: String = "vstup.txt"): List<Rozsah>
 {
     val casyPrichodOdchod = mutableListOf<Rozsah>()
-    val regCasy = "([0-1][0-9]|2[0-3]):([0-5][0-9])\\s+([0-1][0-9]|2[0-3]):([0-5][0-9])\$"
-        File(nazov).forEachLine {
-            if (regCasy.toRegex().matches(it))
-            {
-                val vysledok = regCasy.toRegex().find(it)
-                val h1 = (vysledok!!.groups[1]!!.value).toInt()
-                val m1 = (vysledok.groups[2]!!.value).toInt()
-                val h2 = (vysledok.groups[3]!!.value).toInt()
-                val m2 = (vysledok.groups[4]!!.value).toInt()
-                casyPrichodOdchod.add(Rozsah(Cas(h1, m1), Cas(h2, m2)))
-            }
-            else
-            {
-                println("Chybny format zdroja!")
-            }
+    val regCasy = "([0-1]\\d|2[0-3]):([0-5]\\d)\\s+([0-1]\\d|2[0-3]):([0-5]\\d)\$"
+    File(nazov).forEachLine {
+        if (regCasy.toRegex().matches(it))
+        {
+            val vysledok = regCasy.toRegex().find(it)
+            val h1 = (vysledok!!.groups[1]!!.value).toInt()
+            val m1 = (vysledok.groups[2]!!.value).toInt()
+            val h2 = (vysledok.groups[3]!!.value).toInt()
+            val m2 = (vysledok.groups[4]!!.value).toInt()
+            casyPrichodOdchod.add(Rozsah(Cas(h1, m1), Cas(h2, m2)))
         }
-        return casyPrichodOdchod
+        else
+        {
+            println("Chybny format zdroja!")
+        }
+    }
+    return casyPrichodOdchod
 }
 
+fun vytvorZahlavie(): String
+{
+    var vratZahlavie = ""
+    for (j in 1..24)
+    {
+        print(String.format("%3s", j))
+        vratZahlavie += String.format("%3s", j)
+    }
+    vratZahlavie += "\n"
+    return vratZahlavie
+}
 
+fun vytvorPaticku(hodinyPocty: IntArray): String
+{
+    var vratPaticku = ""
+    for (i in 1 until hodinyPocty.size)
+    {
+        print(String.format("%3s", hodinyPocty[i]))
+        vratPaticku += String.format("%3s", hodinyPocty[i])
+    }
+    return vratPaticku
+}
 
 fun main()
 {
@@ -64,10 +85,10 @@ fun main()
     var vysledokDoSuboru = ""
     //val ziskaneCasy = generujCasyList(15)
     val ziskaneCasy: List<Rozsah>
-    generujCasySubor(15, "vstup.txt")
+    //generujCasySubor(15, "vstup.txt")
     try
     {
-        ziskaneCasy = citajCasySubor("zapis.txt")
+        ziskaneCasy = citajCasySubor("vstup.txt")
     }
     catch (e: FileNotFoundException)
     {
@@ -75,15 +96,9 @@ fun main()
         exitProcess(1)
     }
     //vytvori zahlavie
-    for (j in 1..24)
-    {
-        print(String.format("%3s", j))
-        vysledokDoSuboru += String.format("%3s", j)
-    }
+    vysledokDoSuboru = vytvorZahlavie()
     println()
-    vysledokDoSuboru += "\n"
-    val utriedene=ziskaneCasy.sortedBy{it.zaciatok}
-    //utriedene.forEach { println(it) }
+    val utriedene = ziskaneCasy.sortedBy { it.zaciatok }
     for (rozsah in utriedene)
     {
         val zacniH = rozsah.zaciatok.dajHodinu()
@@ -109,11 +124,7 @@ fun main()
         println(" ${rozsah.zaciatok} ${rozsah.koniec}")
         vysledokDoSuboru += " ${rozsah.zaciatok} ${rozsah.koniec}\n"
     }
-    for (i in 1..24)
-    {
-        print(String.format("%3s", hodinyDna[i]))
-        vysledokDoSuboru += String.format("%3s", hodinyDna[i])
-    }
+    vysledokDoSuboru += vytvorPaticku(hodinyDna)
     var max = 0
     var maxIndex = 0
     for ((index, hodnota) in hodinyDna.withIndex())
@@ -125,17 +136,21 @@ fun main()
         }
     }
     println()
-    println("\nNajcastejsie sa vyskytuje hodnota $maxIndex a to $max krat.")
-    vysledokDoSuboru+="\n\nNajcastejsie sa vyskytuje hodnota $maxIndex a to $max krat."
+    println("\nNajcastejsie sa vyskytuje hodina $maxIndex a to $max krat.")
+    vysledokDoSuboru += "\n\nNajcastejsie sa vyskytuje hodina $maxIndex a to $max krat."
     try
     {
         File("vysledok.txt").writeText(vysledokDoSuboru)
-
     }
     catch (e: FileNotFoundException)
     {
         println("Subor sa nepodarilo vytvorit!")
     }
-
+    val maximum = hodinyDna.maxOf { it }
+    print("Maximum bolo $maximum v hodinach: ")
+    hodinyDna.mapIndexed { index, i -> if (i == maximum) print("$index ") }
+    //println(maxima)
+    //hodinyDna.sort()
+    //hodinyDna.forEachIndexed{index,element-> println("$index,$element") }
 }
 

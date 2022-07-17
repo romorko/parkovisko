@@ -60,6 +60,19 @@ class Cas(h: Int, m: Int) : Comparable<Cas>
         return (this.hod * 60 + this.min) compareTo (other.hod * 60 + other.min)
     }
 
+    operator fun plus(other:Cas):Cas
+    {
+        val plusHod=((this.hod*60+this.min+other.hod+other.min)%60)%24
+        val plusMin=((this.hod*60+this.min+other.hod+other.min)/60)
+        return Cas(plusHod,plusMin)
+    }
+
+    operator fun minus(other:Cas):Cas
+    {
+        val minusHod=if((this.hod*60+this.min-other.hod+other.min)>0)((this.hod*60+this.min-other.hod+other.min)%60)%24 else 0
+        val minusMin=if((this.hod*60+this.min-other.hod+other.min)>0)((this.hod*60+this.min-other.hod+other.min)/60) else 0
+        return Cas(minusHod,minusMin)
+    }
     override fun toString(): String
     {
         val h = if (hod < 10) "0$hod" else "$hod"
